@@ -1,7 +1,8 @@
 #pragma once
+#ifndef  AH_H
+#define AH_H
 class ArgumentHandler
 {
-
 public:
     enum State { GEN, SOV, INV, GEG };
     enum Difficulty { UNS, EASY, NORMAL, HARD };
@@ -26,3 +27,4 @@ private:
     bool IsDigit(char *in);
     bool JudgeR(char *in);
 };
+#endif // ! AH_H

@@ -1,12 +1,13 @@
 #pragma once
 #ifndef DIFEVA_H
 #define DIFEVA_H
+#include "ArgumentHandler.h"
 class DifficultyEvaluation
 {
 public:
     DifficultyEvaluation();
     ~DifficultyEvaluation();
-    double Evaluate(int p[][9]);
+    ArgumentHandler::Difficulty Evaluate(int p[][9]);
     void GetPuzzle(int p[][9]);
 private:
     int puzzle[9][9];
@@ -20,7 +21,7 @@ private:
     // 行/列/宫显性数对排除法：
     // 行/列/宫某两个位置只出现两个相同的候选数，则若行列内则排除同行列的其余位置这两个数的候选
     // 若这两个位置同宫，则还可排除宫内与两个位置同行列的其余位置这两个数的候选
-    void UpdateExplicitPair();
+    void UpdateNakedPair();
     // 行/列/宫隐性数对排除法：
     // 某两个数只出现在某行/列/宫的两个位置，则两位置其余候选数排除
     void UpdateHiddenPair();
@@ -33,8 +34,10 @@ private:
     void PuzzleInit(int p[][9]);
 
     bool IsFinished();
-
-    bool Fill();
+    void Fill(int row, int col, int num);
+    bool FillNakedSingle();
+    bool FillHiddenSingle();
+    bool TryToFill(int &updateCount, int &fillCount1, int &fillCount2);
 };
 
 #endif // ! DIFEVA_H
