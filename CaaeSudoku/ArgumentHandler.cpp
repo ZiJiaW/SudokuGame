@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "ArgumentHandler.h"
-#include <iostream>
 using namespace std;
 const int maxN = 10000;
 const int minR = 20;

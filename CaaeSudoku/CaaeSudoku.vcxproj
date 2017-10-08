@@ -27,7 +27,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -147,6 +147,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgumentHandler.h" />
+    <ClInclude Include="DifficultyEvaluation.h" />
     <ClInclude Include="FileHandler.h" />
     <ClInclude Include="SdkBuffer.h" />
     <ClInclude Include="stdafx.h" />
@@ -156,6 +157,7 @@
   <ItemGroup>
     <ClCompile Include="ArgumentHandler.cpp" />
     <ClCompile Include="CaaeSudoku.cpp" />
+    <ClCompile Include="DifficultyEvaluation.cpp" />
     <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="SdkBuffer.cpp" />
     <ClCompile Include="stdafx.cpp">
