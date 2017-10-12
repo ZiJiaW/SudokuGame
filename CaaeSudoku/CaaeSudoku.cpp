@@ -1,43 +1,94 @@
 #include "stdafx.h"
+#include <iostream>
 #include "FileHandler.h"
 #include "ArgumentHandler.h"
+#include "DifficultyEvaluation.h"
 #include "SdkBuffer.h"
 #include "Table.h"
-#include "DifficultyEvaluation.h"
+#include "CaaeSudoku.h"
 #include <time.h>
+#include "Core.h"
+#include <fstream>
 using namespace std;
-typedef ArgumentHandler::State state;
-const unsigned  int BufferSize = 10000;
-/*
+/*bool IsDiffer(int p[81], int q[81])
+{
+    bool r = true;
+    for (int i = 0; i < 81; i++)
+    {
+        r &= p[i] == q[i];
+    }
+    return !r;
+}
+bool IsDiffer(int pr[][81], int size)
+{
+    bool r = true;
+    for (int i = 0; i < size - 1; i++)
+    {
+        for (int j = i + 1; j < size; j++)
+        {
+            r &= IsDiffer(pr[i], pr[j]);
+            if (!IsDiffer(pr[i], pr[j]))
+                cout << i << ' ' << j << endl;
+        }
+    }
+    return r;
+}*/
+//int result[10000][81];
 int main(int argc, char**args)
 {
+////////////////////////////////////test generate
+    /*int size = 10000;
+    generate(size, result);
+    ofstream file;
+    file.open("test.txt", ios::out | ios::app);
+    for (int i = 0; i < size; i++)
+    {
+        file << i << endl;
+        for (int j = 0; j < 81; j++)
+        {
+            if (j % 9 == 8)
+                file << result[i][j] << endl;
+            else
+                file << result[i][j] << ' ';
+        }
+        file << endl;
+    }
+    cout << IsDiffer(result, size);
+    file.close();
+    return 0;*/
+
+
+////////////////////////////////////////
 #ifdef DEBUG
     clock_t start = clock();
 #endif // DEBUG
     ArgumentHandler* ah = new ArgumentHandler();
     ah->ParseInput(argc, args);
-    state st = ah->GetState();
-    if (st == state::INV)
+    State st = ah->GetState();
+    if (st == State::INV)
     {
         delete ah;
         return 1;
     }
     FileHandler *fh = new FileHandler();
     Table *tb = new Table();
-    if (st == state::GEN)
+    if (st == State::GEN)
     {
         do {
             unsigned int count = ah->GetCount();
+            /*if (count > MaxCounts)
+            {
+            cout << "Count is too big" << endl;
+            break;
+            }*/
             if (!fh->Open("sudoku.txt", "w")) {
                 cout << "File IO error!" << endl;
                 break;
             }
-            tb->SetZero();
-            tb->Set(0, 0, 6);
-            tb->Generate(count, fh);
+            tb->GenerateRandomly(count, fh);
         } while (false);
     }
-    else
+    else if (st == State::SOV)
     {
         FileHandler* dst = new FileHandler();
         do {
@@ -53,20 +104,24 @@ int main(int argc, char**args)
         dst->Close();
         delete dst;
     }
+    else if (st == State::GEG_R)
+    {
+
+    }
     fh->Close();
     delete fh;
     delete tb;
 #ifdef  DEBUG
-    cout << "elapsed" << (float(clock()) - start) / 1000;
-    getchar();
+    cout << "elapsed" << (float(clock()) - start) / 1000 << endl;
+//    getchar();
 #endif //  DEBUG
     return 0;
 }
 
-*/
-// for debug
 
-int main()
+
+// for evaluate
+/*int main()
 {
     /*int p[9][9] = {
         {4,0,0,8,0,9,1,0,0},
@@ -215,7 +270,7 @@ int main()
         {0,0,3,1,7,6,0,9,0},
         {0,0,7,0,0,0,0,0,0}
     };//fiendish 40:10 and one updatecell*/
-    int p[9][9] = {
+/*    int p[9][9] = {
         {9,0,1,0,0,2,0,4,7},
         {4,5,0,0,9,0,0,6,0},
         {0,0,0,0,0,5,0,0,2},
@@ -241,4 +296,4 @@ int main()
         }
     }
     return 0;
-}
+}*/

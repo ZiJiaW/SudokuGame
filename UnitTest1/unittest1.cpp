@@ -1,8 +1,78 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
 #include "..\CaaeSudoku\ArgumentHandler.h"
+#include "..\CaaeSudoku\Core.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
+void Transform(int p[9][9], int q[81])
+{
+    for (int i = 0; i < 9; i++)
+    {
+        for (int j = 0; j < 9; j++)
+        {
+            q[9 * i + j] = p[i][j];
+        }
+    }
+}
+bool IsTrueAnswer(int p[81], int s[81])
+{
+    bool r = true;
+    for (int i = 0; i < 81; i++)
+    {
+        r &= (p[i] != 0 ? p[i] == s[i] : true);
+    }
+    return r;
+}
+bool IsValid(int s[81])
+{
+    int pr[9][9];
+    for (int i = 0; i < 81; i++)
+    {
+        pr[i / 9][i % 9] = s[i];
+    }
+    bool r = true;
+    for (int i = 0; i < 9; ++i)
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            for (int k = 0; k < 9; ++k)
+            {
+                r &= (k != j ? pr[i][j] != pr[i][k] : true);
+                r &= (k != i ? pr[i][j] != pr[k][j] : true);
+            }
+            int a = 3 * (i / 3);
+            int b = 3 * (j / 3);
+            for (int p = a; p < a + 3; ++p)
+            {
+                for (int q = b; q < b + 3; ++q)
+                {
+                    r &= ((p != i&&q != j) ? pr[i][j] != pr[p][q] : true);
+                }
+            }
+        }
+    }
+    return r;
+}
+bool IsDiffer(int p[81], int q[81])
+{
+    bool r = true;
+    for (int i = 0; i < 81; i++)
+    {
+        r &= p[i] == q[i];
+    }
+    return !r;
+}
+bool IsDiffer(int pr[][81],int size)
+{
+    for (int i = 0; i < size - 1; i++)
+    {
+        for (int j = i + 1; j < size; j++)
+        {
+            if (!IsDiffer(pr[i], pr[j]))
+                return false;
+        }
+    }
+    return true;
+}
 namespace UnitTest1
 {		
 	TEST_CLASS(UnitTest1)
@@ -17,12 +87,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 98897 &
-                ah.GetState() == ArgumentHandler::State::GEN&
+                ah.GetState() == State::GEN&
                 ah.GetLower() == 0 &
                 ah.GetUpper() == 0 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == false;
+                ah.GetDifficulty() == Difficulty::UNS;
             Assert::AreEqual(r, true);
 		}
         TEST_METHOD(TestMethod2)
@@ -33,12 +102,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 9999 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_M&
                 ah.GetLower() == 0 &
                 ah.GetUpper() == 0 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::NORMAL&
-                ah.GetUnique() == false;
+                ah.GetDifficulty() == Difficulty::NORMAL;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod3)
@@ -49,12 +117,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 7542 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_M&
                 ah.GetLower() == 0 &
                 ah.GetUpper() == 0 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::NORMAL&
-                ah.GetUnique() == false;
+                ah.GetDifficulty() == Difficulty::NORMAL;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod4)
@@ -65,12 +132,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 124 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_RU&
                 ah.GetLower() == 23 &
                 ah.GetUpper() == 29 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == true;
+                ah.GetDifficulty() == Difficulty::UNS;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod5)
@@ -81,12 +147,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 124 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_RU&
                 ah.GetLower() == 23 &
                 ah.GetUpper() == 29 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == true;
+                ah.GetDifficulty() == Difficulty::UNS;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod6)
@@ -97,12 +162,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 1675 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_R&
                 ah.GetLower() == 22 &
                 ah.GetUpper() == 37 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == false;
+                ah.GetDifficulty() == Difficulty::UNS;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod7)
@@ -113,12 +177,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 1675 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_R&
                 ah.GetLower() == 22 &
                 ah.GetUpper() == 37 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == false;
+                ah.GetDifficulty() == Difficulty::UNS;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod8)
@@ -129,12 +192,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 11 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_U&
                 ah.GetLower() == 0 &
                 ah.GetUpper() == 0 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == true;
+                ah.GetDifficulty() == Difficulty::UNS;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod9)
@@ -145,12 +207,11 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 11 &
-                ah.GetState() == ArgumentHandler::State::GEG&
+                ah.GetState() == State::GEG_U&
                 ah.GetLower() == 0 &
                 ah.GetUpper() == 0 &
                 ah.GetPathName() == NULL&
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == true;
+                ah.GetDifficulty() == Difficulty::UNS;
             Assert::AreEqual(r, true);
         }
         TEST_METHOD(TestMethod10)
@@ -161,12 +222,65 @@ namespace UnitTest1
             ArgumentHandler ah;
             ah.ParseInput(argc, argv);
             bool r = ah.GetCount() == 0 &
-                ah.GetState() == ArgumentHandler::State::SOV&
+                ah.GetState() == State::SOV&
                 ah.GetLower() == 0 &
                 ah.GetUpper() == 0 &
                 strcmp(ah.GetPathName(), "100.txt") == 0 &
-                ah.GetDifficulty() == ArgumentHandler::Difficulty::UNS&
-                ah.GetUnique() == false;
+                ah.GetDifficulty() == Difficulty::UNS;
+            Assert::AreEqual(r, true);
+        }
+        // test API generetor
+        TEST_METHOD(TestMethod11)
+        {
+            int p[9][9] = {
+                { 0,0,0,0,0,0,8,0,0 },
+                { 0,1,0,2,3,5,4,0,0 },
+                { 0,0,9,0,6,0,0,5,3 },
+                { 0,6,0,3,0,0,0,4,0 },
+                { 0,9,5,0,8,0,1,3,0 },
+                { 0,7,0,0,0,2,0,8,0 },
+                { 9,5,0,0,2,0,3,0,0 },
+                { 0,0,3,1,7,6,0,9,0 },
+                { 0,0,7,0,0,0,0,0,0 }
+            };
+            int puzzle[81];
+            Transform(p, puzzle);
+            int solution[81];
+            bool r = solve(puzzle, solution);
+            r &= IsTrueAnswer(puzzle, solution);
+            r &= IsValid(solution);
+            Assert::AreEqual(r, true);
+        }
+        TEST_METHOD(TestMethod12)
+        {
+            int p[9][9] = {
+                { 8,0,0,0,0,0,0,0,3 },
+                { 0,0,2,3,5,0,0,0,0 },
+                { 0,6,0,0,8,9,0,0,0 },
+                { 0,8,0,0,0,2,3,0,0 },
+                { 0,9,3,0,0,0,1,7,0 },
+                { 0,0,5,6,0,0,0,8,0 },
+                { 0,0,0,5,6,0,0,1,0 },
+                { 0,0,0,0,2,7,4,0,0 },
+                { 6,0,0,0,0,0,0,0,7 }
+            };
+            int puzzle[81];
+            Transform(p, puzzle);
+            int solution[81];
+            bool r = solve(puzzle, solution);
+            r &= IsTrueAnswer(puzzle, solution);
+            r &= IsValid(solution);
+            Assert::AreEqual(r, true);
+        }
+        TEST_METHOD(TestMethod13)
+        {
+            int size = 10000;
+            int(*result)[81] = new int[size][81];
+            generate(size, result);
+            bool r = IsDiffer(result, size);
+            for (int i = 0; i < size; i++)
+                r &= IsValid(result[i]);
+            delete[] result;
             Assert::AreEqual(r, true);
         }
 	};

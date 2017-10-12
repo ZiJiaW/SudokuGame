@@ -1,21 +1,23 @@
 #pragma once
+#include "CaaeSudoku.h"
 #ifndef  AH_H
 #define AH_H
 class ArgumentHandler
 {
+
 public:
-    enum State { GEN, SOV, INV, GEG };
-    enum Difficulty { UNS, EASY, NORMAL, HARD };
     ArgumentHandler();
     void ParseInput(int argc, char **argv);
     State GetState();
     unsigned int GetCount();
-    char * GetPathName();
-    bool GetUnique();
+    const char * GetPathName();
     Difficulty GetDifficulty();
-    int GetLower();
-    int GetUpper();
+    unsigned int GetLower();
+    unsigned int GetUpper();
     ~ArgumentHandler();
+public:
+    static bool IsDigit(const char *in);
+    static bool JudgeR(const char *in);
 private:
     State state;
     Difficulty difc;
@@ -24,7 +26,5 @@ private:
     bool unique;
     int lower;
     int upper;
-    bool IsDigit(char *in);
-    bool JudgeR(char *in);
 };
 #endif // ! AH_H

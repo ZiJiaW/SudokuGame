@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <iostream>
 #include "ArgumentHandler.h"
 using namespace std;
 const int maxN = 10000;
@@ -18,7 +19,7 @@ ArgumentHandler::ArgumentHandler()
 ArgumentHandler::~ArgumentHandler()
 {
 }
-char *ArgumentHandler::GetPathName()
+const char *ArgumentHandler::GetPathName()
 {
     return pathname;
 }
@@ -26,11 +27,11 @@ unsigned int ArgumentHandler::GetCount()
 {
     return count;
 }
-ArgumentHandler::State ArgumentHandler::GetState()
+State ArgumentHandler::GetState()
 {
     return state;
 }
-bool ArgumentHandler::IsDigit(char *in)
+bool ArgumentHandler::IsDigit(const char *in)
 {
     bool r = true;
     for (int i = 0; in[i] != '\0'; ++i)
@@ -39,7 +40,7 @@ bool ArgumentHandler::IsDigit(char *in)
     }
     return r;
 }
-bool ArgumentHandler::JudgeR(char *in)
+bool ArgumentHandler::JudgeR(const char *in)
 {
     bool r = true;
     int count = 0;
@@ -51,19 +52,15 @@ bool ArgumentHandler::JudgeR(char *in)
     }
     return r&(count == 1);
 }
-bool ArgumentHandler::GetUnique()
-{
-    return unique;
-}
-ArgumentHandler::Difficulty ArgumentHandler::GetDifficulty()
+Difficulty ArgumentHandler::GetDifficulty()
 {
     return difc;
 }
-int ArgumentHandler::GetLower()
+unsigned int ArgumentHandler::GetLower()
 {
     return lower;
 }
-int ArgumentHandler::GetUpper()
+unsigned int ArgumentHandler::GetUpper()
 {
     return upper;
 }
@@ -88,7 +85,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
                 throw invalid_argument("The argument of \"-c\" should be a positive integer!");
             }
             sscanf_s(args[2], "%d", &count);
-            if (count > maxCounts||count<=0)
+            if (count > maxCounts || count <= 0)
             {
                 throw invalid_argument("The argument of \"-c\" should be in range [1,1000000]!");
             }
@@ -118,7 +115,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
     }
     else
     {
-        state = State::GEG;
+        state = GEG_M;
         int nUsed = 0;
         int mUsed = 0;
         int rUsed = 0;
@@ -139,7 +136,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
                         throw invalid_argument("The argument of \"-n\" should be a positive integer!");
                     }
                     sscanf_s(args[i + 1], "%d", &count);
-                    if (count > maxN||count<=0)//test int.max+1
+                    if (count > maxN || count <= 0)//test int.max+1
 
                     {
                         throw invalid_argument("The argument of \"-n\" should be in range [1,10000]!");
@@ -162,7 +159,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
                     {
                         throw invalid_argument("Required argument of \"-m\" missing!");
                     }
-                    if (args[i+1][1]!='\0')
+                    if (args[i + 1][1] != '\0')
                     {
                         throw invalid_argument("The argument of \"-m\" should be only a digit!");
                     }
@@ -230,7 +227,7 @@ lower~upper, and lower/upper must be a positive integer!");
                 break;
             }
         }
-        if (state == State::GEG)
+        if (state == State::GEG_M)
         {
             if (nUsed > 1 || uUsed > 1 || mUsed > 1 || rUsed > 1)
             {
@@ -247,6 +244,20 @@ lower~upper, and lower/upper must be a positive integer!");
                 cout << "Argument -n must be used at least once, and it should be used together with -m/-r/-u!" << endl;
                 state = State::INV;
             }
+            else if (rUsed>0 && uUsed>0)
+            {
+                state = GEG_RU;
+            }
+            else if (rUsed > 0)
+            {
+                state = GEG_R;
+            }
+            else  if (uUsed > 0)
+            {
+                state = GEG_U;
+            }
         }
+
     }
 }
+

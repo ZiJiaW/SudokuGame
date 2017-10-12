@@ -147,6 +147,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArgumentHandler.h" />
+    <ClInclude Include="CaaeSudoku.h" />
+    <ClInclude Include="Core.h" />
     <ClInclude Include="DifficultyEvaluation.h" />
     <ClInclude Include="FileHandler.h" />
     <ClInclude Include="SdkBuffer.h" />
@@ -157,6 +159,7 @@
   <ItemGroup>
     <ClCompile Include="ArgumentHandler.cpp" />
     <ClCompile Include="CaaeSudoku.cpp" />
+    <ClCompile Include="Core.cpp" />
     <ClCompile Include="DifficultyEvaluation.cpp" />
     <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="SdkBuffer.cpp" />

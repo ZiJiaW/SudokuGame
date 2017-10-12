@@ -688,7 +688,7 @@ bool DifficultyEvaluation::TryToFill(int &updateCount, int &fillCount1, int &fil
 /*
 对输入的数独谜题进行难度评估；
 */
-ArgumentHandler::Difficulty DifficultyEvaluation::Evaluate(int p[][9])
+Difficulty DifficultyEvaluation::Evaluate(int p[][9])
 {
     PuzzleInit(p);
     int c1 = 0, c2 = 0, c3 = 0, c4 = 0, c5 = 0, f1 = 0, f2 = 0;
@@ -715,16 +715,16 @@ ArgumentHandler::Difficulty DifficultyEvaluation::Evaluate(int p[][9])
     cout << c1 << ' ' << c2 << ' ' << c3 << ' ' << c4 << ' ' << c5 << endl;
     cout << f1 << ' ' << f2 << endl;
     double pr = double(f1) / double(f2);
-    bool usedUpperStra = c2 != 0 | c3 != 0 | c4 != 0 | c5 != 0;
-    bool isHard = usedUpperStra | !IsFinished() | pr < 1.8;
-    bool isMedium = !usedUpperStra & IsFinished() & pr >= 1.8 & pr <= 10;
-    bool isEasy = !usedUpperStra & IsFinished() & pr>10;
+    bool usedUpperStra = c2 != 0 || c3 != 0 || c4 != 0 || c5 != 0;
+    bool isHard = usedUpperStra || !IsFinished() || pr < 1.8;
+    bool isMedium = !usedUpperStra && IsFinished() && pr >= 1.8 && pr <= 10;
+    bool isEasy = !usedUpperStra && IsFinished() && pr>10;
     if (isEasy)
-        return ArgumentHandler::Difficulty::EASY;
+        return Difficulty::EASY;
     else if (isMedium)
-        return ArgumentHandler::Difficulty::NORMAL;
-    else if (isHard)
-        return ArgumentHandler::Difficulty::HARD;
+        return Difficulty::NORMAL;
+    else
+        return Difficulty::HARD;
 }
 
 void DifficultyEvaluation::GetPuzzle(int p[][9])

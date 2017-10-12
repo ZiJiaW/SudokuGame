@@ -7,7 +7,7 @@ class DifficultyEvaluation
 public:
     DifficultyEvaluation();
     ~DifficultyEvaluation();
-    ArgumentHandler::Difficulty Evaluate(int p[][9]);
+    Difficulty Evaluate(int p[][9]);
     void GetPuzzle(int p[][9]);
 private:
     int puzzle[9][9];

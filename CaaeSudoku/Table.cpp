@@ -1,36 +1,12 @@
 #include "stdafx.h"
 #include "Table.h"
+#include <math.h>
 #include <vector>
+#include <ctime>
 using namespace std;
-extern const unsigned  int BufferSize;
+//extern const unsigned  int gBufferSize;
 Table::Table()
 {
-    total = 0; //the number of soultion found by far
-    top = 0;  //the searching process will stop when 'total' reaches to 'top' 
-    SetZero();//set all elements to zero
-}
-void Table::Generate(unsigned int max, SdkBuffer* sdb)
-{
-    //set some initial argument 
-    this->total = 0;
-    this->top = max;
-    //clear the buffer
-    sdb->Clear();
-    //limit 'max' to the capacity 
-    if (max > sdb->GetCapacity())
-        max = sdb->GetCapacity();
-    pCurrentBuffer = sdb;
-    //start solving
-    solve(0, 1);
-}
-void Table::Set(int row, int col, int num)
-{
-    //set one element
-    cells[row][col] = num;
-}
-void Table::SetZero()
-{
-    //initiate all elements
     for (int i = 0; i < 9; i++)
     {
         for (int j = 0; j < 9; j++)
@@ -39,55 +15,187 @@ void Table::SetZero()
         }
     }
 }
+void Table::Generate(unsigned int max, SdkBuffer* sdb)
+{
+    //limit 'max' to the capacity
+    unsigned int left = sdb->GetCapacity() - sdb->GetSize();
+    if (max > left)max = left;
+    //start solving
+    startSolving(max, sdb);
+}
+
+void Table::Generate(unsigned int total, FileHandler*fh)
+{
+    //$todo(Felix):add argument checking in debug mode (total >0 ,fh!=null)
+    //allocate a new buffer 
+    SdkBuffer * sdb = new SdkBuffer(gBufferSize);
+    //generate sudoku solution and write to the file
+    for (unsigned int i = 0; i < total; i += gBufferSize)
+    {
+        sdb->Clear();
+        if (total - i <= gBufferSize)
+            Generate(total - i, sdb);
+        else
+            Generate(gBufferSize, sdb);
+        fh->WriteSdb(sdb);
+    }
+    delete sdb;
+}
+bool IsDiffer(int line[9], int(*record)[9], int nowsize)
+{
+    for (int i = 0; i < nowsize; i++)
+    {
+        bool r = true;
+        for (int j = 0; j < 9; j++)
+        {
+            r &= line[j] == record[i][j];
+        }
+        if (r)
+            return false;
+    }
+    return true;
+}
+void Shuffle(int line[9], int(*record)[9], int nowsize)
+{
+    int r, mid;
+    do {
+        for (int i = 8; i >= 0; i--)
+        {
+            r = rand() % (i + 1);//0-i
+            mid = line[i];
+            line[i] = line[r];
+            line[r] = mid;
+        }
+    } while (!IsDiffer(line, record, nowsize));
+}
+void Table::GenerateRandomly(unsigned int total, SdkBuffer* sdb)
+{
+    int firstLine[] = { 1,2,3,4,5,6,7,8,9 };
+    int(*record)[9] = new int[total][9];
+    srand(clock());
+    for (int i = 0; i < total; i++)
+    {
+        Shuffle(firstLine, record, i);
+        for (int j = 0; j < 9; j++)
+        {
+            cells[0][j] = firstLine[j];
+            record[i][j] = firstLine[j];
+        }
+        startSolving(1, sdb);
+    }
+    delete[]record;
+}
+void Table::GenerateRandomly(unsigned int total, FileHandler*fh)
+{
+    SdkBuffer sdb(gBufferSize);
+    //generate sudoku solution and write to the file
+    for (unsigned int i = 0; i < total; i += gBufferSize)
+    {
+        sdb.Clear();
+        if (total - i <= gBufferSize)
+            GenerateRandomly(total - i, &sdb);
+        else
+            GenerateRandomly(gBufferSize, &sdb);
+        fh->WriteSdb(&sdb);
+    }
+}
+
 bool Table::Solve(SdkBuffer* sdb)
 {
+    /*
+    //$todo(Felix):add argument checking in debug mode
     total = 0;
     top = 1;
     pCurrentBuffer = sdb;
     startSolving();
     //total==1 means we found a solution
     if (total == 1)return true;
-    else return false;
-}
-void Table::Generate(unsigned int total, FileHandler*fh)
-{
-    //allocate a new buffer 
-    SdkBuffer * sdb = new SdkBuffer(BufferSize);
-    //generate sudoku solution and write to the file
-    for (unsigned int i = 0; i < total; i += BufferSize)
-    {
-        sdb->Clear();
-        if (total - i <= BufferSize)
-            Generate(total - i, sdb);
-        else
-            Generate(BufferSize, sdb);
-        fh->WriteSdb(sdb);
-    }
-    delete sdb;
+    else return false;*/
+    return true;
 }
 void Table::Solve(SdkBuffer* sdbSrc, SdkBuffer* sdbDst)
 {
-    sdbDst->Clear();
-    while (sdbSrc->GetSize()>0)
+    //$todo(Felix):add argument checking in debug mode
+    SdkBuffer* sdbMid = new SdkBuffer(gBufferSize);
+    for (int i = 0; i < sdbSrc->GetSize(); i++)
     {
-        sdbSrc->Pop(cells);
-        Solve(sdbDst);
+        sdbSrc->Get(i, cells);
+        startSolving(1, sdbDst);
     }
 }
 void Table::Solve(FileHandler* src, FileHandler*dst)
 {
-    SdkBuffer*  sdbSrc = new SdkBuffer(BufferSize);
-    SdkBuffer* sdbDst = new SdkBuffer(BufferSize);
+    //$todo(Felix):add argument checking in debug mode
+    SdkBuffer*  sdbSrc = new SdkBuffer(gBufferSize);
+    SdkBuffer* sdbDst = new SdkBuffer(gBufferSize);
     while (src->HasNext())
     {
+        sdbDst->Clear();
         src->ReadSdb(sdbSrc);
         Solve(sdbSrc, sdbDst);
         dst->WriteSdb(sdbDst);
     }
+    delete sdbSrc;
+    delete sdbDst;
 }
 
+void Table::digSpecNum(int table[][9], unsigned int num)
+{
+    srand(clock());
+    int index[81];
+    for (int i = 0; i < 81; i++)
+    {
+        index[i] = i;
+    }
+    for (int i = 80; i >= 1; i--)
+    {
+        int r = rand() % (i + 1);
+        int mid = index[r];
+        index[r] = index[i];
+        index[i] = mid;
+    }
+    for (int i = 0; i < num; i++)
+    {
+        unsigned int row = index[i] / 9;
+        unsigned int col = index[i] % 9;
+        table[row][col] = 0;
+    }
+}
+void Table::digSpecNumUniquely(int table[][9], unsigned int num)
+{
+    //TODO : Do we need to check whether the sudoku is valid?
+    srand(clock());
+    for (int i = 0; i < num; i++)
+    {
+        int r = rand() % 81;
+        int row = r / 9;
+        int col = r % 9;
+        if (table[row][col] == 0)
+        {
+            i -= 1;
+            continue;
+        }
+
+        int value = table[row][col];
+        table[row][col] = 0;
+
+        //Set
+        SdkBuffer sdk(1);
+        sdk.Fill(table);
+        sdk.Pop(cells);
+        int total = startSolving(2, NULL);
+        if (total == 2)
+        {
+            i--;
+            table[row][col] = value;
+            continue;
+        }
+    }
+}
 int*  Table::lookUp(int rst, int  cst, int num)
 {
+    //$todo(Felix):add more comments
+    //$todo(Felix):improve its effeciency
     int *result = new int[10];
     int index = 0;
     int ron = 0, con = 0;
@@ -99,6 +207,7 @@ int*  Table::lookUp(int rst, int  cst, int num)
             con = j + cst * 3;
             if (cells[ron][con] == num)
             {
+                delete result;
                 return NULL;
             }
             if (cells[ron][con] != 0)
@@ -122,17 +231,16 @@ int*  Table::lookUp(int rst, int  cst, int num)
     result[index] = -1;
     return result;
 }
-void Table::startSolving()
+unsigned int Table::startSolving(unsigned int maxAnswer, SdkBuffer* pResult)
 {
-    solve(0, 1);
+    unsigned int total = 0;
+    solve(0, 1, total, maxAnswer, pResult);
+    return total;
 }
-void Table::solve(int subt, int num)
+void Table::solve(int subt, int num, unsigned int &total, unsigned int&top, SdkBuffer* pCurrentBuffer)
 {
     //this function works recursively to fill number 1-9 one by one to all the 9 sub tables
-
-    //subt index subtable ,which is a 3x3 palace. It`s index starts from 0 to 8
-    //num (1-9)  is the current  number we try to fiil in  
-
+    //num (1-9)  is the current  number we try to fill in  
 
     //	printf("%d %d\n", subt, num);
     //if we get enough solutions ,just exit
@@ -142,13 +250,16 @@ void Table::solve(int subt, int num)
     else if (num == 10)
     {
         total += 1;
-        pCurrentBuffer->Fill(cells);
+        if (pCurrentBuffer != NULL)
+        {
+            pCurrentBuffer->Fill(cells);
+        }
         return;
     }
     //we should try the next number while that all palaces are reached
     else  if (subt == 9)
     {
-        solve(0, num + 1);
+        solve(0, num + 1, total, top, pCurrentBuffer);
         return;
     }
     //Row or Column of SubTable
@@ -156,10 +267,9 @@ void Table::solve(int subt, int num)
     int cst = subt % 3;
     //suitable cells 
     int * suitcells = lookUp(rst, cst, num);
-    //randomsort(suitcells);
     if (suitcells == NULL)
     {
-        solve(subt + 1, num);
+        solve(subt + 1, num, total, top, pCurrentBuffer);
         return;
     }
     int index = 0;
@@ -171,8 +281,8 @@ void Table::solve(int subt, int num)
         ron = suitcells[index] / 9;
         con = suitcells[index] % 9;
         cells[ron][con] = num;
-        solve(subt + 1, num);
-        cells[ron][con] = 0;//todo
+        solve(subt + 1, num, total, top, pCurrentBuffer);
+        cells[ron][con] = 0;
         index++;
     }
     delete[] suitcells;

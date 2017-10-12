@@ -1,5 +1,8 @@
 #pragma once
 #include "SdkBuffer.h"
+#ifndef FH_H
+#define FH_H
+
 class FileHandler
 {
 private:
@@ -13,3 +16,4 @@ public:
     bool HasNext();
     ~FileHandler();
 };
+#endif // !FH_H

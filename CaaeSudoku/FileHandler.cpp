@@ -39,9 +39,10 @@ void FileHandler::ReadSdb(SdkBuffer* sdb)
         if (fgetc(file) == EOF)break;
     }
 }
+
 void FileHandler::WriteSdb(SdkBuffer* sdb)
 {
-    const char *buffer = sdb->GetBuffer();
+    const char *buffer = sdb->ToString();
     char line[18];
     unsigned int index = 0;
     for (; index < sdb->GetSize(); index++) {
