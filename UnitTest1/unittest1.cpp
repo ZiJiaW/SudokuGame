@@ -2,6 +2,8 @@
 #include "CppUnitTest.h"
 #include "..\CaaeSudoku\ArgumentHandler.h"
 #include "..\CaaeSudoku\Core.h"
+#include "..\CaaeSudoku\DifficultyEvaluation.h"
+#include "..\CaaeSudoku\Table.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 void Transform(int p[9][9], int q[81])
 {
@@ -12,6 +14,23 @@ void Transform(int p[9][9], int q[81])
             q[9 * i + j] = p[i][j];
         }
     }
+}
+bool IsInRange(int lower, int upper, int result[][81], int size)
+{
+    for (int i = 1; i < size; i++)
+    {
+        int count = 0;
+        for (int k = 0; k < 81; k++)
+        {
+            if (result[i][k] == 0)
+            {
+                count++;
+            }
+        }
+        if (count<lower || count>upper)
+            return false;
+    }
+    return true;
 }
 bool IsTrueAnswer(int p[81], int s[81])
 {
@@ -274,13 +293,87 @@ namespace UnitTest1
         }
         TEST_METHOD(TestMethod13)
         {
-            int size = 10000;
+            int size = 1000;
             int(*result)[81] = new int[size][81];
             generate(size, result);
             bool r = IsDiffer(result, size);
             for (int i = 0; i < size; i++)
                 r &= IsValid(result[i]);
             delete[] result;
+            Assert::AreEqual(r, true);
+        }
+        TEST_METHOD(Test14)
+        {
+            // -n 100 -r 23~29 
+            int size = 1000;
+            int(*result)[81] = new int[size][81];
+            generate(size, 23, 29, false, result);
+            bool r = IsInRange(23, 29, result, size);
+            int solution[81];
+            for (int i = 0; i < size; i++)
+            {
+                r &= solve(result[i], solution);
+                r &= IsValid(solution);
+            }
+            Assert::AreEqual(r, true);
+        }
+        TEST_METHOD(Test15)
+        {
+            // -n 100 -r 40~50 -u
+            int size = 100;
+            int(*result)[81] = new int[size][81];
+            generate(size, 40, 50, true, result);
+            bool r = IsInRange(40, 50, result, size);
+            int solution[81];
+            for (int i = 0; i < size; i++)
+            {
+                r &= solve(result[i], solution);
+                r &= IsValid(solution);
+            }
+            Table table;
+            for (int k = 0; k < size; k++)
+            {
+                for (int i = 0; i < 81; i++)
+                {
+                    table.cells[i / 9][i % 9] = result[k][i];
+                }
+                r &= table.startSolving(2, NULL) == 1;
+            }
+
+            Assert::AreEqual(r, true);
+        }
+        TEST_METHOD(Test16)
+        {
+            // -n 1000 -m 1
+            int size = 10;
+            int(*result)[81] = new int[size][81];
+            generate(size, Difficulty::EASY, result);
+            DifficultyEvaluation e;
+            bool r = true;
+            int p[9][9];
+            for (int i = 0; i < size; i++)
+            {
+                for (int k = 0; k < 81; k++)
+                {
+                    p[k / 9][k % 9] = result[i][k];
+                }
+                r &= e.Evaluate(p) == Difficulty::EASY;
+            }
+            int solution[81];
+            for (int i = 0; i < size; i++)
+            {
+                r &= solve(result[i], solution);
+                r &= IsValid(solution);
+            }
+            Table table;
+            for (int k = 0; k < size; k++)
+            {
+                for (int i = 0; i < 81; i++)
+                {
+                    table.cells[i / 9][i % 9] = result[k][i];
+                }
+                r &= table.startSolving(2, NULL) == 1;
+            }
             Assert::AreEqual(r, true);
         }
 	};

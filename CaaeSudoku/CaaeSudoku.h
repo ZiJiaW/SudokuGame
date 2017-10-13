@@ -4,10 +4,11 @@
 
 #define DEBUG
 enum State { GEN, SOV, GEG_M, GEG_R, GEG_U, GEG_RU, INV };
-enum Difficulty { UNS, EASY, NORMAL, HARD };
-const unsigned  int gBufferSize = 10000;
+enum Difficulty { UNS, EASY=1, NORMAL=2, HARD=3 };
+const unsigned  int gBufferSize = 1000;
 const unsigned int gMaxGenAmount = 10000000;
-//const char* gOutputFilePath = "sudoku.txt";
+const char* const gOutputFilePath = "sudoku.txt";
+const int gRange[3][2] = { {30,40},{35,45},{40,55} };
 /*
 1.gBufferSize is used to accelerate the generating function.
 2.10,000,000 is the biggest number of which you can get in one generating
@@ -16,5 +17,4 @@ process;
 the solutions to puzzles.
 */
 //const int MaxCounts = 1000000;
-
 #endif // !CSDK_H
