@@ -22,7 +22,16 @@ public:
     int CheckLine();
     int CheckColumn();
     int CheckCell();
+    // 初始化时记录时间
     int time;
+    // 最佳记录
+    int bestRecordEasy;
+    int bestRecordMedium;
+    int bestRecordHard;
+    // 生成当前数独的解，用于提示功能
+    void GenerateSolution();
+    int solution[9][9];
+
 };
 extern _declspec(dllimport) int sum(int a, int b);
 extern _declspec(dllimport) void generate(int number, int mode, int result[][81]);

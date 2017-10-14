@@ -2,6 +2,7 @@
 #include "HelloWorldScene.h"
 #include "CocosGui.h"
 #include "cocos-ext.h"
+#include "I1.h"
 #include "GUI\CCControlExtension\CCControl.h"
 #include "GUI\CCControlExtension\CCControlButton.h"
 USING_NS_CC;
@@ -24,29 +25,39 @@ bool IntroductionScene::init()
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
 
-    auto testLabel = Label::createWithTTF("Introduction of Sudoku: ......", "fonts/Marker Felt.ttf", 60);
-    testLabel->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 0.75f*visibleSize.height));
-    this->addChild(testLabel, 1);
+    auto bg0 = Sprite::create("rules.png");
+    bg0->setPosition(Vec2(visibleSize / 2));
+    this->addChild(bg0, 1); 
 
-    auto returnLabel = Label::createWithTTF("return", "fonts/Marker Felt.ttf", 40);
-    auto returnItem = MenuItemLabel::create(returnLabel, CC_CALLBACK_1(IntroductionScene::ReturnCallBack, this));
-    returnItem->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 2.5f*returnItem->getContentSize().height));
-    auto menu = Menu::create(returnItem, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu, 1);
-    ///////////////try save
-    
-/*
-    auto alabel = Label::createWithTTF(CCUserDefault::sharedUserDefault()->getStringForKey("puzzle").c_str(), "fonts/Marker Felt.ttf", 20);
-    alabel->setPosition(Vec2(origin.x + 20, origin.y + 20));
-    this->addChild(alabel, 1);
- */   
-    //////////////////
+    auto bg = Sprite::create("introduction.png");
+    bg->setPosition(Vec2(visibleSize.width/2,visibleSize.height/2-40));
+    this->addChild(bg, 1);
+
+
+    auto returnButton = Scale9Sprite::create("return.png");
+    returnButton->setContentSize(Size(65, 65));
+    auto rbut = ControlButton::create(returnButton);
+    rbut->setPosition(Vec2(origin.x + visibleSize.width-130 , origin.y + 65));
+    rbut->addTargetWithActionForControlEvents(this, cccontrol_selector(IntroductionScene::ReturnCallBack), Control::EventType::TOUCH_UP_INSIDE);
+    this->addChild(rbut, 2);
+
+    auto rightButton = Scale9Sprite::create("Right.png");
+    rightButton->setContentSize(Size(65, 65));
+    auto rightbut = ControlButton::create(rightButton);
+    rightbut->setPosition(Vec2(origin.x + visibleSize.width - 65, origin.y + 65));
+    rightbut->addTargetWithActionForControlEvents(this, cccontrol_selector(IntroductionScene::from0to1), Control::EventType::TOUCH_UP_INSIDE);
+    this->addChild(rightbut, 2);
+
     return true;
 }
 
-void IntroductionScene::ReturnCallBack(Ref* pSender)
+void IntroductionScene::ReturnCallBack(Ref* pSender, Control::EventType type)
 {
     auto scene = HelloWorld::createScene();
     Director::getInstance()->replaceScene(TransitionCrossFade::create(0.4, scene));
+}
+void IntroductionScene::from0to1(cocos2d::Ref* pSender, Control::EventType type)
+{
+    auto scene = Intro1::createScene();
+    Director::getInstance()->replaceScene(TransitionSlideInR::create(0.4, scene));
 }

@@ -5,16 +5,14 @@
 #include "GUI\CCControlExtension\CCControl.h"
 #include "GUI\CCControlExtension\CCControlButton.h"
 #include "IntroductionScene.h"
-#include "SettingScene.h"
 #include "GameScene.h"
 #include "Global.h"
 USING_NS_CC;
 using namespace cocos2d::ui;
 using namespace cocos2d::extension;
-
-const char* startGame = "Start Game";
-const char* continueGame = "Continue";
-const char* settings = "Settings";
+using namespace CocosDenshion;
+const char* startGame = "New Game";
+const char* continueGame = "Load Game";
 const char* introduction = "Introduction";
 const char* exitt = "Exit";
 
@@ -35,63 +33,116 @@ bool HelloWorld::init()
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
-
-    /////////////////////////////
-    // 2. add a menu item with "X" image, which is clicked to quit the program
-    //    you may modify it.
-
-    // add a "close" icon to exit the progress. it's an autorelease object
-    /*auto closeItem = MenuItemImage::create(
-                                           "CloseNormal.png",
-                                           "CloseSelected.png",
-                                           CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
+    // bgm预加载
+    SimpleAudioEngine::getInstance()->preloadBackgroundMusic("bg.wav");
+    // 默认开启背景音乐
+    if(!SimpleAudioEngine::getInstance()->isBackgroundMusicPlaying())
+        SimpleAudioEngine::getInstance()->playBackgroundMusic("bg.wav", true);
+    // 加载最佳记录时间
+    if (!(ShareGlobal()->bestRecordEasy = CCUserDefault::sharedUserDefault()->getIntegerForKey("bestRecordEasy")))
+    {
+        ShareGlobal()->bestRecordEasy = -1;// -1 表示还没有记录
+    }
+    if (!(ShareGlobal()->bestRecordMedium = CCUserDefault::sharedUserDefault()->getIntegerForKey("bestRecordMedium")))
+    {
+        ShareGlobal()->bestRecordMedium = -1;// -1 表示还没有记录
+    }
+    if (!(ShareGlobal()->bestRecordHard = CCUserDefault::sharedUserDefault()->getIntegerForKey("bestRecordHard")))
+    {
+        ShareGlobal()->bestRecordHard = -1;// -1 表示还没有记录
+    }
     
-    closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width/2 ,
-                                origin.y + closeItem->getContentSize().height/2));*/
+    // add background
+    
+    auto bg = Sprite::create("background.jpg");
+    bg->setPosition(Vec2(visibleSize / 2));
+    bg->setContentSize(Size(1024, 768));
+    this->addChild(bg, 0);
+    
     ////////////////////////////////////my menu
-    auto stLabel = Label::createWithTTF(startGame, "fonts/Marker Felt.ttf", 40);
-    auto ctLabel = Label::createWithTTF(continueGame, "fonts/Marker Felt.ttf", 40);
-    auto seLabel = Label::createWithTTF(settings, "fonts/Marker Felt.ttf", 40);
-    auto inLabel = Label::createWithTTF(introduction, "fonts/Marker Felt.ttf", 40);
-    auto exLabel = Label::createWithTTF(exitt, "fonts/Marker Felt.ttf", 40);
-
+    auto stLabel = Label::createWithTTF(startGame, "fonts/Marker Felt.ttf", 50);
+    auto ctLabel = Label::createWithTTF(continueGame, "fonts/Marker Felt.ttf", 50);
+    auto inLabel = Label::createWithTTF(introduction, "fonts/Marker Felt.ttf", 50);
+    auto exLabel = Label::createWithTTF(exitt, "fonts/Marker Felt.ttf", 50);
+    stLabel->setColor(Color3B(0, 0, 0));
+    ctLabel->setColor(Color3B(0, 0, 0));
+    inLabel->setColor(Color3B(0, 0, 0));
+    exLabel->setColor(Color3B(0, 0, 0));
     auto itemSt = MenuItemLabel::create(stLabel, CC_CALLBACK_1(HelloWorld::StartGameCallBack, this));
     auto itemCt = MenuItemLabel::create(ctLabel, CC_CALLBACK_1(HelloWorld::ContinueCallBack, this));
-    auto itemSe = MenuItemLabel::create(seLabel, CC_CALLBACK_1(HelloWorld::SettingCallBack, this));
     auto itemIn = MenuItemLabel::create(inLabel, CC_CALLBACK_1(HelloWorld::IntroductionCallBack, this));
     auto itemEx = MenuItemLabel::create(exLabel, CC_CALLBACK_1(HelloWorld::menuCloseCallback, this));
     
-    itemSt->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 10.5f*itemSt->getContentSize().height));
-    itemCt->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 8.5f*itemSt->getContentSize().height));
-    itemSe->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 6.5f*itemSt->getContentSize().height));
+    itemSt->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 8.5f*itemSt->getContentSize().height));
+    itemCt->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 6.5f*itemSt->getContentSize().height));
     itemIn->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 4.5f*itemSt->getContentSize().height));
     itemEx->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + 2.5f*itemSt->getContentSize().height));
 
+
     // create menu, it's an autorelease object
-    auto menu = Menu::create(itemSt, itemCt, itemSe, itemIn, itemEx, NULL);
+    auto menu = Menu::create(itemSt, itemCt, itemIn, itemEx, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
 
-    /////////////////////////////
-    // 3. add your codes below...
-    //try save
-    /*std::string storedPro("590602083023000670678139005215086407309010568067905312731800000952701830406590701");
-    CCUserDefault::sharedUserDefault()->setStringForKey("puzzle", storedPro);
-    CCUserDefault::sharedUserDefault()->flush();//保存*/
-    
-    // add a label shows "Hello World"
-    // create and initialize a label
-    
-    auto label = Label::createWithTTF("Sudoku Game 1.0", "fonts/Marker Felt.ttf", 80);
-    
-    // position the label on the center of the screen
-    label->setPosition(Vec2(origin.x + visibleSize.width/2,
-                            origin.y + visibleSize.height - label->getContentSize().height));
+    // print record 给出各难度最佳记录
+    std::string stmp;
+    char ctmp[6];
+    stmp += "Easy: ";
+    if (ShareGlobal()->bestRecordEasy == -1)
+    {
+        stmp += "no record";
+    }
+    else
+    {
+        itoa(ShareGlobal()->bestRecordEasy, ctmp, 10);
+        stmp += ctmp;
+        stmp += " s";
+    }
 
-    // add the label as a child to this layer
-    this->addChild(label, 1);
+    auto test = Label::createWithTTF("Best Record", "fonts/Marker Felt.ttf", 30);
+    test->setColor(Color3B::BLACK);
+    test->setPosition(900,200);
+    this->addChild(test, 2);
 
-    
+    auto recordLabelEasy = Label::createWithTTF(stmp.c_str(), "fonts/Marker Felt.ttf",30);
+    recordLabelEasy->setColor(Color3B::BLACK);
+    recordLabelEasy->setPosition(origin.x + 900, origin.y + 150);
+    this->addChild(recordLabelEasy, 1);
+
+    stmp.clear();
+    stmp += "Medium: ";
+    if (ShareGlobal()->bestRecordMedium == -1)
+    {
+        stmp += "no record";
+    }
+    else
+    {
+        itoa(ShareGlobal()->bestRecordMedium, ctmp, 10);
+        stmp += ctmp;
+        stmp += " s";
+    }
+    auto recordLabelMedium = Label::createWithTTF(stmp.c_str(), "fonts/Marker Felt.ttf",30);
+    recordLabelMedium->setColor(Color3B::BLACK);
+    recordLabelMedium->setPosition(origin.x + 900, origin.y + 100);
+    this->addChild(recordLabelMedium, 1);
+
+    stmp.clear();
+    stmp += "Hard: ";
+    if (ShareGlobal()->bestRecordHard == -1)
+    {
+        stmp += "no record";
+    }
+    else
+    {
+        itoa(ShareGlobal()->bestRecordHard, ctmp, 10);
+        stmp += ctmp;
+        stmp += " s";
+    }
+    auto recordLabelHard = Label::createWithTTF(stmp.c_str(), "fonts/Marker Felt.ttf",30);
+    recordLabelHard->setColor(Color3B::BLACK);
+    recordLabelHard->setPosition(origin.x + 900, origin.y + 50);
+    this->addChild(recordLabelHard, 1);
+
     return true;
 }
 
@@ -121,7 +172,7 @@ void HelloWorld::StartGameCallBack(Ref* pSender)
     colorLay->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
     this->addChild(colorLay, 3);
 
-    auto cancelLabel = Label::createWithTTF("cancel", "fonts/Marker Felt.ttf", 40);
+    auto cancelLabel = Label::createWithTTF("Cancel", "fonts/Marker Felt.ttf", 40);
     auto cancelItem = MenuItemLabel::create(cancelLabel, [=](Ref* pSender) {
         colorLay->removeFromParent();
         Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this, true);
@@ -138,7 +189,7 @@ void HelloWorld::StartGameCallBack(Ref* pSender)
     });
     easyItem->setPosition(Vec2(origin.x + visibleSize.width / 4, origin.y + visibleSize.height / 4 + 120));
 
-    auto mediumLabel = Label::createWithTTF("Medium", "fonts/Marker Felt.ttf", 40);
+    auto mediumLabel = Label::createWithTTF("Normal", "fonts/Marker Felt.ttf", 40);
     auto mediumItem = MenuItemLabel::create(mediumLabel, [=](Ref* pSender) {
         ShareGlobal()->degree = 2;
         ShareGlobal()->GenerateGame();
@@ -164,27 +215,18 @@ void HelloWorld::StartGameCallBack(Ref* pSender)
 }
 void HelloWorld::ContinueCallBack(Ref* pSender)
 {
-    if (CCUserDefault::sharedUserDefault()->getStringForKey("puzzle").c_str())
+    if (CCUserDefault::sharedUserDefault()->getIntegerForKey("time"))
     {
         for (int i = 0; i < 81; i++)
         {
             ShareGlobal()->grid[i / 9][i % 9].num = CCUserDefault::sharedUserDefault()->getStringForKey("puzzle").c_str()[i] - '0';
-/*            int a = ShareGlobal()->grid[i / 9][i % 9].num;
-            if (a != 0)
-                ShareGlobal()->grid[i / 9][i % 9].isGiven = true;
-            else
-                ShareGlobal()->grid[i / 9][i % 9].isGiven = false;*/
             ShareGlobal()->grid[i / 9][i % 9].isGiven = bool(CCUserDefault::sharedUserDefault()->getStringForKey("given").c_str()[i] - '0');
         }
+        ShareGlobal()->degree = CCUserDefault::sharedUserDefault()->getIntegerForKey("degree");
         ShareGlobal()->time = CCUserDefault::sharedUserDefault()->getIntegerForKey("time");
         auto scene = GameScene::createScene();
         Director::getInstance()->replaceScene(TransitionCrossFade::create(0.4, scene));
     }
-}
-void HelloWorld::SettingCallBack(Ref* pSender)
-{
-    auto scene = SettingScene::createScene();
-    Director::getInstance()->replaceScene(TransitionCrossFade::create(0.4, scene));
 }
 void HelloWorld::IntroductionCallBack(Ref* pSender)
 {

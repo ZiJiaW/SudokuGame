@@ -146,3 +146,17 @@ int Global::CheckCell()
     }
     return -1;
 }
+void Global::GenerateSolution()
+{
+    int puzzle[81];
+    int result[81];
+    for (int i = 0; i < 81; i++)
+    {
+        puzzle[i] = grid[i / 9][i % 9].num;
+    }
+    solve(puzzle, result);
+    for (int i = 0; i < 81; i++)
+    {
+        solution[i / 9][i % 9] = result[i];
+    }
+}
