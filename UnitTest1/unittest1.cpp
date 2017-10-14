@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CppUnitTest.h"
-#include "..\CaaeSudoku\ArgumentHandler.h"
-#include "..\CaaeSudoku\Core.h"
+#include "ArgumentHandler.h"
+#include "Core.h"
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 void Transform(int p[9][9], int q[81])
 {
