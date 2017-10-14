@@ -109,22 +109,74 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 // now define the callback functions
 void HelloWorld::StartGameCallBack(Ref* pSender)
 {
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    // 弹出窗口选择难度：HARD MEDIUM EASY 以及取消按钮
+    Director::getInstance()->getEventDispatcher()->pauseEventListenersForTarget(this, true);
+    auto colorLay = LayerColor::create(Color4B(51, 51, 255, 200));
+    colorLay->ignoreAnchorPointForPosition(false);
+    colorLay->setAnchorPoint(Vec2(0.5, 0.5));
+    colorLay->changeHeight(visibleSize.height / 2);
+    colorLay->changeWidth(visibleSize.width / 2);
+    colorLay->setPosition(Vec2(origin.x + visibleSize.width / 2, origin.y + visibleSize.height / 2));
+    this->addChild(colorLay, 3);
 
+    auto cancelLabel = Label::createWithTTF("cancel", "fonts/Marker Felt.ttf", 40);
+    auto cancelItem = MenuItemLabel::create(cancelLabel, [=](Ref* pSender) {
+        colorLay->removeFromParent();
+        Director::getInstance()->getEventDispatcher()->resumeEventListenersForTarget(this, true);
+    });
+    cancelItem->setPosition(Vec2(origin.x + visibleSize.width / 4, origin.y + visibleSize.height / 4 - 120));
+
+    auto easyLabel = Label::createWithTTF("Easy", "fonts/Marker Felt.ttf", 40);
+    auto easyItem = MenuItemLabel::create(easyLabel, [=](Ref* pSender) {
+        ShareGlobal()->degree = 1;
+        ShareGlobal()->GenerateGame();
+        ShareGlobal()->time = 0;
+        auto scene = GameScene::createScene();
+        Director::getInstance()->replaceScene(TransitionCrossFade::create(0.4, scene));
+    });
+    easyItem->setPosition(Vec2(origin.x + visibleSize.width / 4, origin.y + visibleSize.height / 4 + 120));
+
+    auto mediumLabel = Label::createWithTTF("Medium", "fonts/Marker Felt.ttf", 40);
+    auto mediumItem = MenuItemLabel::create(mediumLabel, [=](Ref* pSender) {
+        ShareGlobal()->degree = 2;
+        ShareGlobal()->GenerateGame();
+        ShareGlobal()->time = 0;
+        auto scene = GameScene::createScene();
+        Director::getInstance()->replaceScene(TransitionCrossFade::create(0.4, scene));
+    });
+    mediumItem->setPosition(Vec2(origin.x + visibleSize.width / 4, origin.y + visibleSize.height / 4 + 40));
+
+    auto hardLabel = Label::createWithTTF("Hard", "fonts/Marker Felt.ttf", 40);
+    auto hardItem = MenuItemLabel::create(hardLabel, [=](Ref* pSender) {
+        ShareGlobal()->degree = 3;
+        ShareGlobal()->GenerateGame();
+        ShareGlobal()->time = 0;
+        auto scene = GameScene::createScene();
+        Director::getInstance()->replaceScene(TransitionCrossFade::create(0.4, scene));
+    });
+    hardItem->setPosition(Vec2(  visibleSize.width / 4,  visibleSize.height / 4 -40));
+
+    auto menu = Menu::create(cancelItem, easyItem, mediumItem, hardItem, NULL);
+    menu->setPosition(Vec2(0,0));
+    colorLay->addChild(menu, 4);
 }
 void HelloWorld::ContinueCallBack(Ref* pSender)
 {
-   // auto savedPuzzle = CCUserDefault::sharedUserDefault()->getStringForKey("puzzle").c_str();
     if (CCUserDefault::sharedUserDefault()->getStringForKey("puzzle").c_str())
     {
         for (int i = 0; i < 81; i++)
         {
             ShareGlobal()->grid[i / 9][i % 9].num = CCUserDefault::sharedUserDefault()->getStringForKey("puzzle").c_str()[i] - '0';
-            int a = ShareGlobal()->grid[i / 9][i % 9].num;
+/*            int a = ShareGlobal()->grid[i / 9][i % 9].num;
             if (a != 0)
                 ShareGlobal()->grid[i / 9][i % 9].isGiven = true;
             else
-                ShareGlobal()->grid[i / 9][i % 9].isGiven = false;
+                ShareGlobal()->grid[i / 9][i % 9].isGiven = false;*/
+            ShareGlobal()->grid[i / 9][i % 9].isGiven = bool(CCUserDefault::sharedUserDefault()->getStringForKey("given").c_str()[i] - '0');
         }
+        ShareGlobal()->time = CCUserDefault::sharedUserDefault()->getIntegerForKey("time");
         auto scene = GameScene::createScene();
         Director::getInstance()->replaceScene(TransitionCrossFade::create(0.4, scene));
     }
