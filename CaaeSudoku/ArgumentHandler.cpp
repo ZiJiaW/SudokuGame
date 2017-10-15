@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include "ArgumentHandler.h"
+#include "CaaeSudoku.h"
 using namespace std;
 const int maxN = 10000;
 const int minR = 20;
@@ -64,7 +65,7 @@ unsigned int ArgumentHandler::GetUpper()
 {
     return upper;
 }
-void ArgumentHandler::ParseInput(int argc, char** args)
+void ArgumentHandler::ParseInput(int argc,  char** args)
 {
     if (argc < 3)
     {
@@ -85,7 +86,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
                 throw invalid_argument("The argument of \"-c\" should be a positive integer!");
             }
             sscanf_s(args[2], "%d", &count);
-            if (count > maxCounts || count <= 0)
+            if (count > maxCounts||count<=0)
             {
                 throw invalid_argument("The argument of \"-c\" should be in range [1,1000000]!");
             }
@@ -115,7 +116,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
     }
     else
     {
-        state = GEG_M;
+		state = GEG_M;
         int nUsed = 0;
         int mUsed = 0;
         int rUsed = 0;
@@ -136,7 +137,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
                         throw invalid_argument("The argument of \"-n\" should be a positive integer!");
                     }
                     sscanf_s(args[i + 1], "%d", &count);
-                    if (count > maxN || count <= 0)//test int.max+1
+                    if (count > maxN||count<=0)//test int.max+1
 
                     {
                         throw invalid_argument("The argument of \"-n\" should be in range [1,10000]!");
@@ -159,7 +160,7 @@ void ArgumentHandler::ParseInput(int argc, char** args)
                     {
                         throw invalid_argument("Required argument of \"-m\" missing!");
                     }
-                    if (args[i + 1][1] != '\0')
+                    if (args[i+1][1]!='\0')
                     {
                         throw invalid_argument("The argument of \"-m\" should be only a digit!");
                     }
@@ -244,20 +245,19 @@ lower~upper, and lower/upper must be a positive integer!");
                 cout << "Argument -n must be used at least once, and it should be used together with -m/-r/-u!" << endl;
                 state = State::INV;
             }
-            else if (rUsed>0 && uUsed>0)
-            {
-                state = GEG_RU;
-            }
-            else if (rUsed > 0)
-            {
-                state = GEG_R;
-            }
-            else  if (uUsed > 0)
-            {
-                state = GEG_U;
-            }
+			else if(rUsed>0 && uUsed>0)
+			{ 
+				state = GEG_RU;
+			}
+			else if (rUsed > 0)
+			{
+				state = GEG_R;
+			}
+			else  if (uUsed > 0)
+			{
+				state = GEG_U;
+			}
         }
 
     }
 }
-

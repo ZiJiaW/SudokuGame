@@ -18,57 +18,57 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="FileHandler.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="SdkBuffer.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Table.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="ArgumentHandler.h">
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SdkBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="FileHandler.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="DifficultyEvaluation.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Core.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="CaaeSudoku.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Core.h">
+    <ClInclude Include="ArgumentHandler.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Table.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CaaeSudoku.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="FileHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="SdkBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Table.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ArgumentHandler.cpp">
+    <ClCompile Include="FileHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="DifficultyEvaluation.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Core.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CaaeSudoku.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ArgumentHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

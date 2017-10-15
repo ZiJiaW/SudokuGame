@@ -1,299 +1,129 @@
 #include "stdafx.h"
 #include <iostream>
+#include <time.h>
 #include "FileHandler.h"
 #include "ArgumentHandler.h"
-#include "DifficultyEvaluation.h"
-#include "SdkBuffer.h"
 #include "Table.h"
-#include "CaaeSudoku.h"
-#include <time.h>
+#include "SdkBuffer.h"
 #include "Core.h"
-#include <fstream>
+#include "CaaeSudoku.h"
 using namespace std;
-/*bool IsDiffer(int p[81], int q[81])
-{
-    bool r = true;
-    for (int i = 0; i < 81; i++)
-    {
-        r &= p[i] == q[i];
-    }
-    return !r;
-}
-bool IsDiffer(int pr[][81], int size)
-{
-    bool r = true;
-    for (int i = 0; i < size - 1; i++)
-    {
-        for (int j = i + 1; j < size; j++)
-        {
-            r &= IsDiffer(pr[i], pr[j]);
-            if (!IsDiffer(pr[i], pr[j]))
-                cout << i << ' ' << j << endl;
-        }
-    }
-    return r;
-}*/
-//int result[10000][81];
 int main(int argc, char**args)
 {
-////////////////////////////////////test generate
-    /*int size = 10000;
-    generate(size, result);
-    ofstream file;
-    file.open("test.txt", ios::out | ios::app);
-    for (int i = 0; i < size; i++)
-    {
-        file << i << endl;
-        for (int j = 0; j < 81; j++)
-        {
-            if (j % 9 == 8)
-                file << result[i][j] << endl;
-            else
-                file << result[i][j] << ' ';
-        }
-        file << endl;
-    }
-    cout << IsDiffer(result, size);
-    file.close();
-    return 0;*/
-
-
-////////////////////////////////////////
 #ifdef DEBUG
     clock_t start = clock();
 #endif // DEBUG
-    ArgumentHandler* ah = new ArgumentHandler();
-    ah->ParseInput(argc, args);
-    State st = ah->GetState();
+	ArgumentHandler ah;
+    ah.ParseInput(argc, args);
+    State st = ah.GetState();
     if (st == State::INV)
     {
-        delete ah;
         return 1;
     }
-    FileHandler *fh = new FileHandler();
-    Table *tb = new Table();
-    if (st == State::GEN)
-    {
-        do {
-            unsigned int count = ah->GetCount();
-            /*if (count > MaxCounts)
-            {
-            cout << "Count is too big" << endl;
-            break;
-            }*/
-            if (!fh->Open("sudoku.txt", "w")) {
-                cout << "File IO error!" << endl;
-                break;
-            }
-            tb->GenerateRandomly(count, fh);
-        } while (false);
-    }
-    else if (st == State::SOV)
-    {
-        FileHandler* dst = new FileHandler();
-        do {
-            if (dst->Open("sudoku.txt", "w") && fh->Open(ah->GetPathName(), "r"))
-            {
-                tb->Solve(fh, dst);
-            }
-            else
-            {
-                cout << "Error happend when trying to read puzzle file" << endl;
-            }
-        } while (false);
-        dst->Close();
-        delete dst;
-    }
-    else if (st == State::GEG_R)
-    {
-
-    }
-    fh->Close();
-    delete fh;
-    delete tb;
+	FileHandler fh;
+    Table tb;
+	try {
+		if (st == State::GEN)
+		{
+			do {
+				unsigned int count = ah.GetCount();
+				/*if (count > MaxCounts)
+				{
+					cout << "Count is too big" << endl;
+					break;
+				}*/
+				if (!fh.Open("sudoku.txt", "w")) {
+					cout << "File IO error!" << endl;
+					break;
+				}
+				tb.GenerateRandomly(count, &fh);
+			} while (false);
+		}
+		else if (st == State::SOV)
+		{
+			FileHandler dst;
+			do {
+				if (dst.Open("sudoku.txt", "w") && fh.Open(ah.GetPathName(), "r"))
+				{
+					tb.Solve(&fh, &dst);
+				}
+				else
+				{
+					cout << "Error happend when trying to read puzzle file" << endl;
+				}
+			} while (false);
+			dst.Close();
+		}
+		else if (st == State::GEG_R || st == State::GEG_U || st == State::GEG_RU)
+		{
+			bool unique = false;
+			unsigned int lower = 1, upper = 1;
+			if (st == State::GEG_U || st == State::GEG_RU)
+			{
+				unique = true;
+			}
+			if (st == State::GEG_R || st == State::GEG_RU)
+			{
+				lower = ah.GetLower();
+				upper = ah.GetUpper();
+			}
+			if (fh.Open(gOutputFilePath, "w"))
+			{
+				int arrayBuffer[gBufferSize][81];
+				SdkBuffer sdb(gBufferSize);
+				unsigned int count = ah.GetCount();
+				unsigned int number;
+				for (int i = 0; i < count; i += gBufferSize)
+				{
+					number = gBufferSize;
+					if (count - i < gBufferSize)
+					{
+						number = count - i;
+					}
+					generate(count, lower, upper, unique, arrayBuffer);
+					sdb.InitByArray(arrayBuffer,number);
+					fh.WriteSdb(&sdb);
+				}
+			}
+			else
+			{
+				//throw
+			}
+		}
+		else if (st == State::GEG_M)
+		{
+			Difficulty diff = ah.GetDifficulty();
+			if (fh.Open(gOutputFilePath, "w"))
+			{
+				int arrayBuffer[100][81];
+				SdkBuffer sdb(gBufferSize);
+				unsigned int count = ah.GetCount();
+				unsigned int number;
+				for (int i = 0; i < count; i += gBufferSize)
+				{
+					number = gBufferSize;
+					if (count - i < gBufferSize)
+					{
+						number = count - i;
+					}
+					generate(number, diff, arrayBuffer);
+					sdb.InitByArray(arrayBuffer,number);
+					fh.WriteSdb(&sdb);
+				}
+			}
+			else
+			{
+				//throw 
+			}
+		}
+	}
+	catch(exception ex)
+	{
+		//todo(Zijia):
+	}
+    fh.Close();
 #ifdef  DEBUG
-    cout << "elapsed" << (float(clock()) - start) / 1000 << endl;
-//    getchar();
+    cout << "elapsed" << (float(clock()) - start) / 1000;
 #endif //  DEBUG
     return 0;
 }
-
-
-
-// for evaluate
-/*int main()
-{
-    /*int p[9][9] = {
-        {4,0,0,8,0,9,1,0,0},
-        {0,0,7,0,0,0,0,9,0},
-        {9,5,0,0,2,0,0,0,7},
-        {1,0,0,0,9,0,0,0,3},
-        {3,9,2,4,0,7,8,0,0},
-        {6,0,0,0,3,0,0,0,9},
-        {7,2,0,0,8,0,0,6,0},
-        {0,1,0,0,0,0,2,0,0},
-        {0,0,3,1,0,2,0,0,4}
-    };*/
-   /*int p[9][9] = {
-        {9,6,0,0,1,0,0,3,0},
-        {3,0,2,0,0,0,8,0,4},
-        {0,7,0,0,0,0,0,9,6},
-        {0,0,0,3,0,8,0,0,0},
-        {6,0,9,0,0,0,0,8,5},
-        {0,0,0,4,0,9,0,0,0},
-        {0,2,0,5,8,4,0,6,0},
-        {5,0,8,0,0,0,2,0,7},
-        {0,4,0,0,9,0,3,5,0}
-    };*/
-  /*  int p[9][9] = {
-        {0,0,5,0,0,4,0,0,0},
-        {0,0,0,0,6,0,0,9,0},
-        {3,0,0,0,0,0,0,0,7},
-        {0,0,0,0,4,0,0,0,0},
-        {0,0,8,0,0,0,4,0,0},
-        {5,4,1,0,0,0,0,0,9},
-        {2,0,0,0,0,0,0,0,3},
-        {0,0,7,4,0,0,0,0,0},
-        {0,0,0,0,0,3,0,0,0}
-    };*/
-    
-    /*int p[9][9] = {
-        {4,0,0,3,1,9,0,0,6},
-        {0,0,1,0,0,0,9,0,0},
-        {0,6,7,4,0,0,0,2,1},
-        {7,0,0,0,5,0,0,0,4},
-        {0,0,0,1,4,2,0,0,0},
-        {2,0,0,0,7,0,0,0,8},
-        {0,2,0,0,0,0,0,6,0},
-        {0,0,4,0,0,0,8,0,0},
-        {1,0,0,5,0,8,0,0,7}
-    };*/
-    
-   /* int p[9][9] = {
-        {0,9,0,3,0,0,0,0,8},
-        {0,0,7,0,0,4,1,2,0},
-        {0,4,0,0,0,6,0,5,0},
-        {0,0,9,0,4,0,0,0,1},
-        {4,0,0,7,0,3,0,0,5},
-        {8,0,0,0,6,0,2,0,0},
-        {9,5,0,8,0,0,0,1,0},
-        {0,3,4,6,0,0,9,0,0},
-        {6,0,0,0,0,9,5,3,0}
-    };*/
-   /* int p[9][9] = {
-        {6,9,0,0,5,0,0,2,3},
-        {4,0,7,0,0,0,6,0,1},
-        {0,2,0,0,7,0,0,4,0},
-        {0,0,0,1,3,2,0,0,0},
-        {2,0,1,5,0,6,9,0,7},
-        {0,0,0,7,4,9,0,0,0},
-        {0,6,0,0,9,0,0,7,0},
-        {8,0,5,0,0,0,3,0,4},
-        {9,7,0,0,1,0,0,6,2}
-    };*/
-    /*int p[9][9] = {
-        {5,0,0,6,0,9,0,0,4},
-        {2,0,0,4,0,1,0,0,0},
-        {9,4,0,2,3,5,6,0,8},
-        {1,5,2,9,4,3,7,8,6},
-        {6,8,4,1,2,7,9,5,3},
-        {7,3,9,5,6,8,1,4,2},
-        {3,0,0,7,9,4,0,0,1},
-        {4,0,0,8,0,6,0,0,0},
-        {8,0,0,3,0,2,4,0,7}
-    };*/
-    /*int p[9][9] = {
-        {6,3,0,0,1,0,2,0,0},
-        {0,0,0,0,0,0,0,4,5},
-        {0,0,0,0,0,3,6,9,0},
-        {0,2,4,0,0,6,0,0,0},
-        {0,6,0,0,2,0,0,5,0},
-        {0,0,0,9,0,0,1,6,0},
-        {0,9,8,1,0,0,0,0,0},
-        {4,7,0,0,0,0,0,0,0},
-        {0,0,2,0,6,0,0,8,4}
-    };*/
-    /*int p[9][9] = {
-        {9,0,5,0,0,0,0,7,8},
-        {2,6,0,7,0,0,0,4,0},
-        {0,0,0,0,0,1,0,0,2},
-        {0,0,8,3,9,2,0,5,0},
-        {0,0,0,4,0,8,0,0,0},
-        {0,9,0,6,7,5,8,0,0},
-        {6,0,0,8,0,0,0,0,0},
-        {0,5,0,0,0,6,0,8,9},
-        {8,3,0,0,0,0,2,0,4}
-    };*/
-    /*int p[9][9]=
-    {
-        {9,0,7,3,0,4,5,0,2},
-        {0,0,0,0,0,0,0,0,0},
-        {5,0,8,9,0,7,1,0,4},
-        {2,0,4,0,9,0,8,0,1},
-        {0,0,0,4,0,8,0,0,0},
-        {8,0,5,0,1,0,9,0,6},
-        {3,0,9,1,0,5,2,0,8},
-        {0,0,0,0,0,0,0,0,0},
-        {7,0,1,2,0,6,3,0,5}
-    };//easy in sudoku explainer 45:0*/
-    /*int p[9][9] =
-    {
-        {2,0,0,0,0,9,7,0,5},
-        {0,7,0,0,0,0,0,2,0},
-        {5,0,3,7,2,0,6,0,0},
-        {6,0,0,0,3,0,2,0,0},
-        {0,0,9,2,0,7,1,0,0},
-        {0,0,7,0,4,0,0,0,6},
-        {0,0,4,0,8,1,9,0,2},
-        {0,6,0,0,0,0,0,1,0},
-        {9,0,2,6,0,0,0,0,8}
-    };// medium 38:11*/
-    /*int p[9][9] = {
-        {8,0,0,0,0,0,0,0,3},
-        {0,0,2,3,5,0,0,0,0},
-        {0,6,0,0,8,9,0,0,0},
-        {0,8,0,0,0,2,3,0,0},
-        {0,9,3,0,0,0,1,7,0},
-        {0,0,5,6,0,0,0,8,0},
-        {0,0,0,5,6,0,0,1,0},
-        {0,0,0,0,2,7,4,0,0},
-        {6,0,0,0,0,0,0,0,7}
-    };//hard 37:18*/
-    /*int p[9][9] = {
-        {0,0,0,0,0,0,8,0,0},
-        {0,1,0,2,3,5,4,0,0},
-        {0,0,9,0,6,0,0,5,3},
-        {0,6,0,3,0,0,0,4,0},
-        {0,9,5,0,8,0,1,3,0},
-        {0,7,0,0,0,2,0,8,0},
-        {9,5,0,0,2,0,3,0,0},
-        {0,0,3,1,7,6,0,9,0},
-        {0,0,7,0,0,0,0,0,0}
-    };//fiendish 40:10 and one updatecell*/
-/*    int p[9][9] = {
-        {9,0,1,0,0,2,0,4,7},
-        {4,5,0,0,9,0,0,6,0},
-        {0,0,0,0,0,5,0,0,2},
-        {2,0,4,0,0,0,0,0,0},
-        {0,6,0,0,8,0,0,9,0},
-        {0,0,0,0,0,0,6,0,5},
-        {5,0,0,3,0,0,0,0,0},
-        {0,4,0,0,5,0,0,8,9},
-        {8,2,0,6,0,0,4,0,3}
-    };//medium 32:20
-    DifficultyEvaluation de;
-    de.Evaluate(p);
-    int q[9][9];
-    de.GetPuzzle(q);
-    for (int i = 0; i < 9; ++i)
-    {
-        for (int j = 0; j < 9; ++j)
-        {
-            if (j == 8)
-                cout << q[i][j] << endl;
-            else
-                cout << q[i][j] << ' ';
-        }
-    }
-    return 0;
-}*/
