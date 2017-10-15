@@ -49,7 +49,7 @@ void generate(int number, int lower, int upper, bool unique, int result[][81])
 		buffer->Clear();
 	}
 }
-bool solve(int puzzle[], int solution[81])
+bool solve(int puzzle[], int solution[])
 {
 	int cells[9][9];
 	for (int i = 0; i < 9; i++)
