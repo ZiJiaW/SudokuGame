@@ -713,8 +713,8 @@ Difficulty DifficultyEvaluation::Evaluate(int p[][9])
             continue;
         break;
     }
-    cout << c1 << ' ' << c2 << ' ' << c3 << ' ' << c4 << ' ' << c5 << endl;
-    cout << f1 << ' ' << f2 << endl;
+//    cout << c1 << ' ' << c2 << ' ' << c3 << ' ' << c4 << ' ' << c5 << endl;
+//    cout << f1 << ' ' << f2 << endl;
     double pr = double(f1) / double(f2);
     bool usedUpperStra = c2 != 0 || c3 != 0 || c4 != 0 || c5 != 0;
     bool isHard = usedUpperStra || !IsFinished() || pr < 1.8;
