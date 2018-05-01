@@ -23,6 +23,7 @@ lowerºÍupper±íÊ¾Éú³ÉµÄÊý¶ÀÌâÄ¿¿ÕµÄÊýÄ¿µÄÉÏÏÂÏÞ£¬·¶Î§Îª[20,55]£¬×¢Òâupper>=lower£
 ÖÆ×÷µÄÊý¶ÀÓÎÏ·ÔÚBINÄ¿Â¼ÏÂµÄSudokuGUI.rarÖÐ£¬ÏÂÔØÏÂÀ´½âÑ¹ºóµÄÎÄ¼þÖÐ£¬´ò¿ªSudokuGame.exe¼´¿É£¬×¢Òâ²»ÄÜËæÒâÉ¾µôÎÄ¼þÖÐµÄ¿âÎÄ¼þ»òÊÇÒÆ¶¯SudokuGame.exeµÄÎ»ÖÃ£»
 
 # ½çÃæÕ¹Ê¾
+
 ![image1](SudokuGame/BIN/show.JPG)
 
 ![image2](SudokuGame/BIN/show2.JPG)
