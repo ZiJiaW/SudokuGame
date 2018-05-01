@@ -21,3 +21,8 @@ lowerºÍupper±íÊ¾Éú³ÉµÄÊı¶ÀÌâÄ¿¿ÕµÄÊıÄ¿µÄÉÏÏÂÏŞ£¬·¶Î§Îª[20,55]£¬×¢Òâupper>=lower£
 
 ## ÓÎÏ·ËµÃ÷
 ÖÆ×÷µÄÊı¶ÀÓÎÏ·ÔÚBINÄ¿Â¼ÏÂµÄSudokuGUI.rarÖĞ£¬ÏÂÔØÏÂÀ´½âÑ¹ºóµÄÎÄ¼şÖĞ£¬´ò¿ªSudokuGame.exe¼´¿É£¬×¢Òâ²»ÄÜËæÒâÉ¾µôÎÄ¼şÖĞµÄ¿âÎÄ¼ş»òÊÇÒÆ¶¯SudokuGame.exeµÄÎ»ÖÃ£»
+
+# ½çÃæÕ¹Ê¾
+![image1](http://github.com/ZiJiaW/SudokuGame/raw/master/BIN/show.JPG)
+
+![image2](http://github.com/ZiJiaW/SudokuGame/raw/master/BIN/show2.JPG)
