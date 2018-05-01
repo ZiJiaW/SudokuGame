@@ -52,6 +52,11 @@ int main(int argc, char**args)
 				lower = ah.GetLower();
 				upper = ah.GetUpper();
 			}
+            if (st == State::GEG_U)
+            {
+                lower = 20;
+                upper = 20;
+            }
 			fh.Open(gOutputFilePath, "w");
 			SdkBuffer sdb(gBufferSize);
 			unsigned int count = ah.GetCount();
