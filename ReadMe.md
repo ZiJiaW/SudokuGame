@@ -24,6 +24,6 @@ lower∫Õupper±Ì æ…˙≥…µƒ ˝∂¿Ã‚ƒøø’µƒ ˝ƒøµƒ…œœ¬œﬁ£¨∑∂ŒßŒ™[20,55]£¨◊¢“‚upper>=lower£
 
 # ΩÁ√Ê’π æ
 
-![image1](SudokuGame/BIN/show.JPG)
+![image1](BIN/show.JPG)
 
-![image2](SudokuGame/BIN/show2.JPG)
+![image2](BIN/show2.JPG)
